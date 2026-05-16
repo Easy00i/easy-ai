@@ -1,5 +1,8 @@
-[phases.setup]
+[[phases.setup]
 nixPkgs = ["maven", "jdk17"]
 
+[phases.build]
+cmds = ["mvn clean package spring-boot:repackage"]
+
 [start]
-cmd = "java -Dserver.port=$PORT -jar target/*.jar"
+cmd = "java -jar target/easy-ai-backend-1.0.0.jar"
