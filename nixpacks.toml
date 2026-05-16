@@ -1,11 +1,10 @@
-[phases.setup]
+[[phases.setup]
 nixPkgs = ["maven", "jdk17"]
 
 [phases.build]
 cmds = [
-  "mvn clean package",
-  "mvn spring-boot:repackage"
+  "mvn clean package spring-boot:repackage -DskipTests"
 ]
 
 [start]
-cmd = "java -jar $(ls target/*.jar | head -n 1)"
+cmd = "java -jar target/easy-ai-backend-1.0.0.jar"
