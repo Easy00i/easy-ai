@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ["maven", "jdk17"]
+
+[start]
+cmd = "java -Dserver.port=$PORT -jar target/*.jar"
