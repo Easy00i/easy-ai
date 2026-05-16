@@ -1,1 +1,4 @@
-
+name: GeneratedPlugin
+version: 1.20.1
+main: com.easyai.generated.GeneratedPlugin
+api-version: '1.20'
