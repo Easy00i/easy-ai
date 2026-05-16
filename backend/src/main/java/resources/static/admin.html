@@ -1,1 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Easy Ai Admin</title>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+<div class="nav"><div class="wrap nav-inner">
+  <div class="brand"><div class="logo"></div><div><div>Easy Ai Admin</div><div class="mini">Private control panel</div></div></div>
+  <div class="nav-links"><a href="/">Main site</a><button class="btn btn-ghost" id="adminSound">Sound: On</button></div>
+</div></div>
 
+<main class="wrap">
+  <section class="auth-shell" id="adminAuth">
+    <div class="auth-card panel">
+      <div class="auth-grid">
+        <div class="auth-left">
+          <div class="eyebrow">Private access only</div>
+          <h1>Admin control center</h1>
+          <p class="lead">Login with admin credentials to manage users, coins, AI settings, and payment approvals.</p>
+          <div class="terminal" id="adminBoot"></div>
+        </div>
+        <div class="auth-right">
+          <div class="field"><label>Admin Email</label><input id="adminEmail" value="admin@easyai.local"></div>
+          <div class="field"><label>Password</label><input id="adminPassword" type="password" value="admin123"></div>
+          <div class="auth-actions"><button class="btn btn-primary" id="adminLoginBtn">Login as Admin</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hidden" id="adminPanelWrap">
+    <div class="section-head"><div><h2>Admin Dashboard</h2><p>Only admin can use this page.</p></div></div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-top:0">Actions</h3>
+        <div class="menu">
+          <button class="menu-btn active" data-view="overview">Overview</button>
+          <button class="menu-btn" data-view="users">Users</button>
+          <button class="menu-btn" data-view="coins">Coins</button>
+          <button class="menu-btn" data-view="payments">Payments</button>
+          <button class="menu-btn" data-view="ai">AI Routing</button>
+        </div>
+      </div>
+      <div class="card" id="adminView">
+        <h3 style="margin-top:0">Overview</h3>
+        <p>Admins can inspect and control the platform here.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="adminToast"></div>
+<script>
+const toastEl = document.getElementById('adminToast');
+function toast(msg){ toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(window.t); window.t = setTimeout(()=>toastEl.classList.remove('show'), 1600); }
+function beep(freq=660, duration=0.05){ try{ const ctx = new (window.AudioContext || window.webkitAudioContext)(); const o = ctx.createOscillator(); const g = ctx.createGain(); o.type='sine'; o.frequency.value = freq; g.gain.value=.03; o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+duration); o.onended = ()=>ctx.close(); } catch(e){} }
+document.getElementById('adminBoot').innerHTML = '[Admin] Secure console ready.\n[Security] Login required.\n[Users] Hidden from public site.\n[Coins] Ready.\n[Payments] Ready.\n<span class="caret"></span>';
+document.getElementById('adminLoginBtn').addEventListener('click', async ()=>{
+  const email = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPassword').value.trim();
+  const res = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password}), credentials:'same-origin' }).then(r=>r.json());
+  if(res.ok && res.data.role === 'admin'){
+    document.getElementById('adminAuth').classList.add('hidden');
+    document.getElementById('adminPanelWrap').classList.remove('hidden');
+    toast('Admin login successful');
+    beep(820);
+  } else {
+    toast(res.message || 'Admin only');
+    beep(220, .08);
+  }
+});
+document.querySelectorAll('.menu-btn').forEach(btn=>btn.addEventListener('click', ()=>{
+  document.querySelectorAll('.menu-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const v = btn.dataset.view;
+  const map = {
+    overview:'<h3 style="margin-top:0">Overview</h3><p>Platform summary and quick actions.</p>',
+    users:'<h3 style="margin-top:0">Users</h3><p>User search, role controls, and activity logs.</p>',
+    coins:'<h3 style="margin-top:0">Coins</h3><p>Coin pack management and audit controls.</p>',
+    payments:'<h3 style="margin-top:0">Payments</h3><p>Approve or review UPI / QR payment events.</p>',
+    ai:'<h3 style="margin-top:0">AI Routing</h3><p>Model selection, premium gating, and prompt routing rules.</p>'
+  };
+  document.getElementById('adminView').innerHTML = map[v];
+  beep(700);
+}));
+document.getElementById('adminSound').addEventListener('click', ()=>{ toast('Sound toggle is local only'); beep(500); });
+</script>
+</body>
+</html>
